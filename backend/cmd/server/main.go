@@ -1,20 +1,20 @@
 package main
 
 import (
+	"expvar"
+	"runtime"
 	"time"
 
+	"github.com/Gumilho/gumi-fetch/internal/database"
 	"github.com/Gumilho/gumi-fetch/internal/env"
 	"go.uber.org/zap"
 )
 
+const version = "0.0.1"
+
 type application struct {
-	config        config
-	store         store.Storage
-	authenticator auth.Authenticator
-	hasher        hashing.Hasher
-	logger        *zap.SugaredLogger
-	rateLimiter   ratelimiter.Limiter
-	cacheStorage  cache.Storage
+	config config
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -58,4 +58,41 @@ func main() {
 		},
 	}
 
+	// Instantiate the dependencies
+
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	if cfg.env == "development" {
+		logger = zap.Must(zap.NewDevelopment()).Sugar()
+	}
+	defer logger.Sync()
+
+	// Database
+	db, err := database.New(
+		cfg.db.addr,
+		cfg.db.maxOpenConns,
+		cfg.db.maxIdleConns,
+		cfg.db.maxIdleTime,
+	)
+	if err != nil {
+		logger.Panic(err)
+	}
+	defer db.Close()
+	logger.Info("database successfully connected")
+
+	app := application{
+		config: cfg,
+		logger: logger,
+	}
+	// Metrics collected
+	expvar.NewString("version").Set(version)
+	expvar.Publish("database", expvar.Func(func() any {
+		return db.Stats()
+	}))
+	expvar.Publish("goroutines", expvar.Func(func() any {
+		return runtime.NumGoroutine()
+	}))
+
+	app.mount()
+	logger.Fatal(app.run())
 }
