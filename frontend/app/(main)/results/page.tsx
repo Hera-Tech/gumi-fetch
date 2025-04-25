@@ -25,7 +25,7 @@ export default async function page({
         {res.data.map((anime) => (
           <li
             key={anime.node.id}
-            className=" bg-gray-800 p-2 rounded-lg flex w-full gap-4"
+            className=" bg-gray-900 p-2 rounded-lg flex w-full gap-4"
           >
             <div>
               <Image
