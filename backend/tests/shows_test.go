@@ -99,14 +99,15 @@ func TestShowController_handleRegister(t *testing.T) {
 		{
 			name: "successful registration",
 			payload: controller.RegisterShowPayload{
-				ID:       3,
-				Title:    "New Show",
-				Source:   "Some Source",
-				SourceID: "new_show_id",
+				ID:          3,
+				Title:       "New Show",
+				Source:      "Some Source",
+				SourceID:    "new_show_id",
+				MainPicture: "https://cdn.myanimelist.net/images/anime/1770/97704.jpg",
 			},
 			mockShowStore: func() *mocks.MockShowStore {
 				store := new(mocks.MockShowStore)
-				show := types.Show{MALID: 3, Title: "New Show", Source: "Some Source", SourceID: "new_show_id"}
+				show := types.Show{MALID: 3, Title: "New Show", Source: "Some Source", SourceID: "new_show_id", MainPicture: "https://cdn.myanimelist.net/images/anime/1770/97704.jpg"}
 				store.On("Create", show).Return(nil)
 				return store
 			}(),
@@ -115,14 +116,15 @@ func TestShowController_handleRegister(t *testing.T) {
 		{
 			name: "error creating show",
 			payload: controller.RegisterShowPayload{
-				ID:       4,
-				Title:    "Failed Show",
-				Source:   "Another Source",
-				SourceID: "failed_id",
+				ID:          4,
+				Title:       "Failed Show",
+				Source:      "Another Source",
+				SourceID:    "failed_id",
+				MainPicture: "https://cdn.myanimelist.net/images/anime/1770/97704.jpg",
 			},
 			mockShowStore: func() *mocks.MockShowStore {
 				store := new(mocks.MockShowStore)
-				show := types.Show{MALID: 4, Title: "Failed Show", Source: "Another Source", SourceID: "failed_id"}
+				show := types.Show{MALID: 4, Title: "Failed Show", Source: "Another Source", SourceID: "failed_id", MainPicture: "https://cdn.myanimelist.net/images/anime/1770/97704.jpg"}
 				store.On("Create", show).Return(assert.AnError)
 				return store
 			}(),
@@ -131,21 +133,48 @@ func TestShowController_handleRegister(t *testing.T) {
 		{
 			name: "invalid payload - missing title",
 			payload: controller.RegisterShowPayload{
-				ID:       5,
-				Source:   "Source",
-				SourceID: "missing_title",
+				ID:          5,
+				Source:      "Source",
+				SourceID:    "missing_title",
+				MainPicture: "https://cdn.myanimelist.net/images/anime/1770/97704.jpg",
 			},
 			mockShowStore:   new(mocks.MockShowStore),
 			expectedStatus:  http.StatusBadRequest,
 			validationError: true,
 		},
 		{
-			name: "invalid payload - empty title",
+			name: "invalid payload - missing main_picture",
 			payload: controller.RegisterShowPayload{
 				ID:       6,
-				Title:    "",
+				Title:    "Title",
 				Source:   "Source",
 				SourceID: "empty_title",
+			},
+			mockShowStore:   new(mocks.MockShowStore),
+			expectedStatus:  http.StatusBadRequest,
+			validationError: true,
+		},
+		{
+			name: "invalid payload - empty main_picture",
+			payload: controller.RegisterShowPayload{
+				ID:          6,
+				Title:       "Title",
+				Source:      "Source",
+				SourceID:    "empty_title",
+				MainPicture: "",
+			},
+			mockShowStore:   new(mocks.MockShowStore),
+			expectedStatus:  http.StatusBadRequest,
+			validationError: true,
+		},
+		{
+			name: "invalid payload - non-url main_picture",
+			payload: controller.RegisterShowPayload{
+				ID:          6,
+				Title:       "Title",
+				Source:      "Source",
+				SourceID:    "empty_title",
+				MainPicture: "random string",
 			},
 			mockShowStore:   new(mocks.MockShowStore),
 			expectedStatus:  http.StatusBadRequest,

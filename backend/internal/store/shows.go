@@ -29,8 +29,8 @@ func (ss *ShowStore) List() ([]types.Show, error) {
 }
 func (ss *ShowStore) Create(show types.Show) error {
 	query := `
-		INSERT INTO shows (mal_id, title, source, source_id)
-		VALUES (:mal_id, :title, :source, :source_id)
+		INSERT INTO shows (mal_id, title, source, source_id, main_picture)
+		VALUES (:mal_id, :title, :source, :source_id, :main_picture)
 	`
 	_, err := ss.db.NamedExec(query, show)
 

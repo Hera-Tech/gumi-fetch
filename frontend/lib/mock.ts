@@ -1,3 +1,7 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
 const mockResults = {
   data: [
     {
@@ -82,13 +86,24 @@ export async function getShows() {
 }
 
 export async function unregisterShow(id: number) {
-  mockShows.splice(
-    mockShows.findIndex((show) => show.id === id),
-    1
-  );
+  const r = await fetch(process.env.BACKEND_URL + "/shows/" + id, {
+    method: "DELETE",
+  });
 }
 
 export async function registerShow(id: number) {
-  const show = allShows.find((show) => show.id === id);
-  if (show) mockShows.push(show);
+  const show = mockResults.data.find((show) => show.node.id === id);
+  if (show) {
+    const body = {
+      id: show.node.id,
+      source: "source",
+      source_id: "source_id",
+      title: show.node.title,
+      main_picture: show.node.main_picture.medium,
+    };
+    const r = await fetch(process.env.BACKEND_URL + "/shows", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  }
 }

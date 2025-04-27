@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -52,10 +53,11 @@ func (sc *ShowController) handleList(w http.ResponseWriter, r *http.Request) {
 }
 
 type RegisterShowPayload struct {
-	ID       int    `json:"id"`
-	Title    string `json:"title" validate:"required,min=1"`
-	Source   string `json:"source"`
-	SourceID string `json:"source_id"`
+	ID          int    `json:"id"`
+	Title       string `json:"title" validate:"required,min=1"`
+	Source      string `json:"source"`
+	SourceID    string `json:"source_id"`
+	MainPicture string `json:"main_picture" validate:"required,min=1,url"`
 }
 
 // RegisterShow godoc
@@ -82,12 +84,13 @@ func (sc *ShowController) handleRegister(w http.ResponseWriter, r *http.Request)
 	}
 
 	show := types.Show{
-		MALID:    payload.ID,
-		Title:    payload.Title,
-		Source:   payload.Source,
-		SourceID: payload.SourceID,
+		MALID:       payload.ID,
+		Title:       payload.Title,
+		Source:      payload.Source,
+		SourceID:    payload.SourceID,
+		MainPicture: payload.MainPicture,
 	}
-
+	log.Println(show)
 	err := sc.showStore.Create(show)
 	if err != nil {
 		utils.InternalServerError(w, r, err, sc.logger)

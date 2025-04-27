@@ -43,10 +43,11 @@ func TestShowController(t *testing.T) {
 	t.Run("register show", func(t *testing.T) {
 		// Prepare the payload for registering a new show
 		showPayload := map[string]interface{}{
-			"id":        11,
-			"title":     "New Show",
-			"source":    "Source",
-			"source_id": "new_show_1",
+			"id":           11,
+			"title":        "New Show",
+			"source":       "Source",
+			"source_id":    "new_show_1",
+			"main_picture": "https://cdn.myanimelist.net/images/anime/1770/97704.jpg",
 		}
 
 		// Register the show
