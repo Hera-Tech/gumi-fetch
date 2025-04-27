@@ -73,7 +73,7 @@ func TestShowController(t *testing.T) {
 	// Test case: Unregister a show
 	t.Run("unregister show", func(t *testing.T) {
 		// Make a DELETE request to unregister the show with ID 1
-		url := fmt.Sprintf("%s/1", baseURL)
+		url := fmt.Sprintf("%s/11", baseURL)
 		resp := makeRequest(t, "DELETE", url, nil, http.StatusNoContent)
 
 		// Check that the response body is empty and status code is OK
