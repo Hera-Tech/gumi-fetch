@@ -5,16 +5,20 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/Gumilho/gumi-fetch/internal/controller"
 	"github.com/Gumilho/gumi-fetch/internal/database"
 	"github.com/Gumilho/gumi-fetch/internal/env"
+	"github.com/Gumilho/gumi-fetch/internal/store"
+	"github.com/Gumilho/gumi-fetch/internal/types"
 	"go.uber.org/zap"
 )
 
 const version = "0.0.1"
 
 type application struct {
-	config config
-	logger *zap.SugaredLogger
+	config         config
+	logger         *zap.SugaredLogger
+	showController types.Controller
 }
 
 type config struct {
@@ -32,13 +36,13 @@ type dbConfig struct {
 }
 
 // @title						GumiFetch
-// @description			Backend API for GumiFetch project
-// @contact.name		Gumi
-// @contact.url			https://gumilho.com
-// @contact.email		gumilho2@gmail.com
-// @license.name		MIT
-// @license.url			https://opensource.org/licenses/MIT
-// @BasePath				/v1
+// @description				Backend API for GumiFetch project
+// @contact.name				Gumi
+// @contact.url				https://gumilho.com
+// @contact.email				gumilho2@gmail.com
+// @license.name				MIT
+// @license.url				https://opensource.org/licenses/MIT
+// @BasePath					/v1
 //
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
@@ -47,8 +51,8 @@ type dbConfig struct {
 func main() {
 	// Config
 	cfg := config{
-		addr:   env.GetString("ADDR", ":8080"),
-		apiURL: env.GetString("EXTERNAL_URL", "localhost:8080"),
+		addr:   env.GetString("ADDR", ":8000"),
+		apiURL: env.GetString("EXTERNAL_URL", "localhost:8000"),
 		env:    env.GetString("ENV", "development"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/auth?sslmode=disable"),
@@ -66,7 +70,6 @@ func main() {
 		logger = zap.Must(zap.NewDevelopment()).Sugar()
 	}
 	defer logger.Sync()
-
 	// Database
 	db, err := database.New(
 		cfg.db.addr,
@@ -80,9 +83,16 @@ func main() {
 	defer db.Close()
 	logger.Info("database successfully connected")
 
+	// Store
+	showStore := store.NewShowStore(db)
+
+	// Controller
+	showController := controller.NewShowController(showStore, logger)
+
 	app := application{
-		config: cfg,
-		logger: logger,
+		config:         cfg,
+		logger:         logger,
+		showController: showController,
 	}
 	// Metrics collected
 	expvar.NewString("version").Set(version)
@@ -93,6 +103,6 @@ func main() {
 		return runtime.NumGoroutine()
 	}))
 
-	app.mount()
-	logger.Fatal(app.run())
+	mux := app.mount()
+	logger.Fatal(app.run(mux))
 }

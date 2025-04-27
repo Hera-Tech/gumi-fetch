@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 func New(addr string, maxOpenConns, maxIdleConns int, maxIdleTime time.Duration) (*sqlx.DB, error) {

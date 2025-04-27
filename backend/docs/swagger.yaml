@@ -1,0 +1,105 @@
+basePath: /v1
+definitions:
+  controller.RegisterShowPayload:
+    properties:
+      id:
+        type: integer
+      source:
+        type: string
+      source_id:
+        type: string
+      title:
+        minLength: 1
+        type: string
+    required:
+    - title
+    type: object
+  domain.Show:
+    properties:
+      mal_id:
+        description: Use as primary key
+        type: integer
+      source:
+        type: string
+      source_id:
+        type: string
+      title:
+        type: string
+    type: object
+info:
+  contact:
+    email: gumilho2@gmail.com
+    name: Gumi
+    url: https://gumilho.com
+  description: Backend API for GumiFetch project
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: GumiFetch
+paths:
+  /shows:
+    get:
+      description: List registered shows
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Show'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: List registered shows
+      tags:
+      - shows
+    post:
+      consumes:
+      - application/json
+      description: Register show
+      parameters:
+      - description: Show payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterShowPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Show'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Register show
+      tags:
+      - shows
+  /shows/{id}:
+    delete:
+      description: Unregister show
+      parameters:
+      - description: Show ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Unregister show
+      tags:
+      - shows
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
