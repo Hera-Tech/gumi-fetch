@@ -15,6 +15,27 @@
     },
     "basePath": "/v1",
     "paths": {
+        "/search": {
+            "get": {
+                "description": "Search shows",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search shows",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/shows": {
             "get": {
                 "description": "List registered shows",
@@ -29,7 +50,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Show"
+                            "$ref": "#/definitions/types.Show"
                         }
                     },
                     "500": {
@@ -65,7 +86,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/domain.Show"
+                            "$ref": "#/definitions/types.Show"
                         }
                     },
                     "500": {
@@ -110,11 +131,16 @@
         "controller.RegisterShowPayload": {
             "type": "object",
             "required": [
+                "main_picture",
                 "title"
             ],
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "main_picture": {
+                    "type": "string",
+                    "minLength": 1
                 },
                 "source": {
                     "type": "string"
@@ -128,9 +154,12 @@
                 }
             }
         },
-        "domain.Show": {
+        "types.Show": {
             "type": "object",
             "properties": {
+                "main_picture": {
+                    "type": "string"
+                },
                 "mal_id": {
                     "description": "Use as primary key",
                     "type": "integer"

@@ -91,19 +91,16 @@ export async function unregisterShow(id: number) {
   });
 }
 
-export async function registerShow(id: number) {
-  const show = mockResults.data.find((show) => show.node.id === id);
-  if (show) {
-    const body = {
-      id: show.node.id,
-      source: "source",
-      source_id: "source_id",
-      title: show.node.title,
-      main_picture: show.node.main_picture.medium,
-    };
-    const r = await fetch(process.env.BACKEND_URL + "/shows", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  }
+export async function registerShow(formData: FormData) {
+  const body = {
+    id: parseInt(formData.get("id") as string),
+    source: "source",
+    source_id: "source_id",
+    title: formData.get("title"),
+    main_picture: formData.get("main_picture"),
+  };
+  const r = await fetch(process.env.BACKEND_URL + "/shows", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }

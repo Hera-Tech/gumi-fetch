@@ -4,6 +4,9 @@ definitions:
     properties:
       id:
         type: integer
+      main_picture:
+        minLength: 1
+        type: string
       source:
         type: string
       source_id:
@@ -12,10 +15,13 @@ definitions:
         minLength: 1
         type: string
     required:
+    - main_picture
     - title
     type: object
-  domain.Show:
+  types.Show:
     properties:
+      main_picture:
+        type: string
       mal_id:
         description: Use as primary key
         type: integer
@@ -37,6 +43,20 @@ info:
     url: https://opensource.org/licenses/MIT
   title: GumiFetch
 paths:
+  /search:
+    get:
+      description: Search shows
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Search shows
+      tags:
+      - search
   /shows:
     get:
       description: List registered shows
@@ -46,7 +66,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Show'
+            $ref: '#/definitions/types.Show'
         "500":
           description: Internal Server Error
           schema: {}
@@ -70,7 +90,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/domain.Show'
+            $ref: '#/definitions/types.Show'
         "500":
           description: Internal Server Error
           schema: {}

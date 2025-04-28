@@ -19,6 +19,7 @@ type application struct {
 	config         config
 	logger         *zap.SugaredLogger
 	showController types.Controller
+	malController  controller.MALController
 }
 
 type config struct {
@@ -26,6 +27,7 @@ type config struct {
 	apiURL string
 	env    string
 	db     dbConfig
+	mal    malConfig
 }
 
 type dbConfig struct {
@@ -33,6 +35,11 @@ type dbConfig struct {
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime  time.Duration
+}
+
+type malConfig struct {
+	clientID     string
+	clientSecret string
 }
 
 // @title						GumiFetch
@@ -59,6 +66,10 @@ func main() {
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetDuration("DB_MAX_IDLE_TIME", 15*time.Minute),
+		},
+		mal: malConfig{
+			clientID:     env.GetString("MAL_CLIENT_ID", ""),
+			clientSecret: env.GetString("MAL_CLIENT_SECRET", ""),
 		},
 	}
 
@@ -88,11 +99,13 @@ func main() {
 
 	// Controller
 	showController := controller.NewShowController(showStore, logger)
+	malController := controller.NewMALController(logger, cfg.mal.clientID)
 
 	app := application{
 		config:         cfg,
 		logger:         logger,
 		showController: showController,
+		malController:  *malController,
 	}
 	// Metrics collected
 	expvar.NewString("version").Set(version)

@@ -23,6 +23,27 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/search": {
+            "get": {
+                "description": "Search shows",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search shows",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/shows": {
             "get": {
                 "description": "List registered shows",
@@ -37,7 +58,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Show"
+                            "$ref": "#/definitions/types.Show"
                         }
                     },
                     "500": {
@@ -73,7 +94,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/domain.Show"
+                            "$ref": "#/definitions/types.Show"
                         }
                     },
                     "500": {
@@ -118,11 +139,16 @@ const docTemplate = `{
         "controller.RegisterShowPayload": {
             "type": "object",
             "required": [
+                "main_picture",
                 "title"
             ],
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "main_picture": {
+                    "type": "string",
+                    "minLength": 1
                 },
                 "source": {
                     "type": "string"
@@ -136,9 +162,12 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.Show": {
+        "types.Show": {
             "type": "object",
             "properties": {
+                "main_picture": {
+                    "type": "string"
+                },
                 "mal_id": {
                     "description": "Use as primary key",
                     "type": "integer"

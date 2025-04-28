@@ -13,6 +13,7 @@ func (app *application) mount() *http.ServeMux {
 	mux := http.NewServeMux()
 	v1 := http.NewServeMux()
 	app.showController.RegisterRoutes(v1)
+	app.malController.RegisterRoutes(v1)
 	v1.HandleFunc("/debug/vars", expvar.Handler().ServeHTTP)
 
 	docsURL := fmt.Sprintf("http://%s/v1/swagger/doc.json", app.config.apiURL)

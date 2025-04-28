@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -37,7 +36,7 @@ func (sc *ShowController) RegisterRoutes(mux *http.ServeMux) {
 //	@Description	List registered shows
 //	@Tags			shows
 //	@Produce		json
-//	@Success		200	{object}	domain.Show
+//	@Success		200	{object}	types.Show
 //	@Failure		500	{object}	error
 //	@Router			/shows [get]
 func (sc *ShowController) handleList(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +67,7 @@ type RegisterShowPayload struct {
 //	@Accept			json
 //	@Produce		json
 //	@Param			payload	body		RegisterShowPayload	true	"Show payload"
-//	@Success		201		{object}	domain.Show
+//	@Success		201		{object}	types.Show
 //	@Failure		500		{object}	error
 //	@Router			/shows [post]
 func (sc *ShowController) handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +89,6 @@ func (sc *ShowController) handleRegister(w http.ResponseWriter, r *http.Request)
 		SourceID:    payload.SourceID,
 		MainPicture: payload.MainPicture,
 	}
-	log.Println(show)
 	err := sc.showStore.Create(show)
 	if err != nil {
 		utils.InternalServerError(w, r, err, sc.logger)
